@@ -59,7 +59,7 @@ year = int(year)
 START_DATE = datetime.date(year, 1, 1)
 
 def generate_commit_map(word):
-    figlet_text = pyfiglet.Figlet(font="banner").renderText(word)
+    figlet_text = pyfiglet.Figlet(font="3x5").renderText(word)
     lines = figlet_text.split("\n")
 
     commit_coords = []

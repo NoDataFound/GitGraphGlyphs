@@ -2,8 +2,9 @@ import os
 import subprocess
 import datetime
 import json
+import pyfiglet
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+import matplotlib.pyplot as plt
 
 BANNER = r"""
       ▗▄▄▖▄    ■             
@@ -38,7 +39,7 @@ print(BANNER)
 if not os.path.exists(COMMIT_DIR):
     os.mkdir(COMMIT_DIR)
 
-subprocess.run(["git", "update-index", "--skip-worktree", LOG_FILE, TRACKER_FILE], check=False)
+subprocess.run(["git", "update-index", "--assume-unchanged", LOG_FILE], check=False)
 
 if os.path.exists(TRACKER_FILE):
     with open(TRACKER_FILE, "r") as f:
@@ -46,17 +47,43 @@ if os.path.exists(TRACKER_FILE):
 else:
     committed_segments = set()
 
-def generate_letter_matrix(word):
-    font = ImageFont.load_default()
-    img_size = (52, 7)  # GitHub's grid: 52 weeks wide, 7 days high
-    img = Image.new("1", img_size, 0)
-    draw = ImageDraw.Draw(img)
-    draw.text((0, 0), word.upper(), fill=1, font=font, encoding="utf-8")
-    matrix = np.array(img)
-    return [(x, y) for y in range(matrix.shape[0]) for x in range(matrix.shape[1]) if matrix[y, x] == 1]
+def generate_commit_map(word):
+    figlet_text = pyfiglet.Figlet(font="banner").renderText(word)
+    lines = figlet_text.split("\n")
+
+    commit_coords = []
+    for y, line in enumerate(lines[:7]):  # Limit to 7 lines (GitHub's grid height)
+        for x, char in enumerate(line[:52]):  # Limit to 52 weeks (GitHub's grid width)
+            if char == "#":  # '#' in figlet output marks a commit
+                commit_coords.append((x, y))
+
+    return commit_coords
 
 word = input("0xDEADBEEF > Enter the payload (word): ").strip().upper()
-letter_coords = generate_letter_matrix(word)
+letter_coords = generate_commit_map(word)
+
+# Show ASCII preview
+figlet_preview = pyfiglet.Figlet(font="banner").renderText(word)
+print(figlet_preview)
+
+# Show GitHub commit preview as a scatter plot
+fig, ax = plt.subplots(figsize=(10, 2))
+ax.set_xlim(-1, 52)
+ax.set_ylim(-1, 7)
+
+for x, y in letter_coords:
+    ax.scatter(x, y, color='green', s=100)
+
+ax.set_xticks([])
+ax.set_yticks([])
+ax.set_frame_on(False)
+plt.show()
+
+# Ask for confirmation before committing
+confirm = input("\n0xBADCAFE | Does this look correct? Type 'hack' to proceed: ").strip().lower()
+if confirm != "hack":
+    print("\n0xC001CAFE | Mission aborted. No changes committed.")
+    exit()
 
 with open(LOG_FILE, "a") as log:
     log.write(f"0xBADCAFE | Bootstrapping '{word}' into the time machine...\n")
@@ -64,9 +91,6 @@ with open(LOG_FILE, "a") as log:
 commit_count = len(committed_segments)
 
 for x, y in letter_coords:
-    if x >= 52 or y >= 7:
-        continue  # Ignore anything out of GitHub's grid size
-
     commit_date = START_DATE + datetime.timedelta(weeks=x, days=y)
     segment_id = f"{x}-{y}"
 

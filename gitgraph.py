@@ -39,6 +39,8 @@ print(BANNER)
 if not os.path.exists(COMMIT_DIR):
     os.mkdir(COMMIT_DIR)
 
+# Stop tracking log file permanently
+subprocess.run(["git", "rm", "--cached", LOG_FILE], check=False)
 subprocess.run(["git", "update-index", "--assume-unchanged", LOG_FILE], check=False)
 
 if os.path.exists(TRACKER_FILE):
@@ -52,18 +54,17 @@ def generate_commit_map(word):
     lines = figlet_text.split("\n")
 
     commit_coords = []
-    for y, line in enumerate(lines[:7]):  # Limit to 7 lines (GitHub's grid height)
-        for x, char in enumerate(line[:52]):  # Limit to 52 weeks (GitHub's grid width)
-            if char == "#":  # '#' in figlet output marks a commit
-                commit_coords.append((x, y))
+    for y, line in enumerate(lines[:7]):  # Limit to 7 rows (GitHub contribution grid height)
+        for x, char in enumerate(line[:52]):  # Limit to 52 columns (GitHub contribution grid width)
+            if char == "#":  # Figlet uses '#' for filled areas
+                commit_coords.append((x, 6 - y))  # Flip Y-axis
 
-    return commit_coords
+    return commit_coords, figlet_text
 
 word = input("0xDEADBEEF > Enter the payload (word): ").strip().upper()
-letter_coords = generate_commit_map(word)
+letter_coords, figlet_preview = generate_commit_map(word)
 
 # Show ASCII preview
-figlet_preview = pyfiglet.Figlet(font="banner").renderText(word)
 print(figlet_preview)
 
 # Show GitHub commit preview as a scatter plot

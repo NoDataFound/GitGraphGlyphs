@@ -27,23 +27,15 @@ BANNER = r"""
         ▀▀▀  ▀            
 """
 
-REPO_DIR = "git-graph-glyphs"
+REPO_DIR = os.getcwd()
 LOG_FILE = "h4x0r_l0g.txt"
 TRACKER_FILE = "commit_t1m3_tr4ck.json"
-REMOTE_URL = "https://github.com/NoDataFound/GitGraphGlyphs.git"
 START_DATE = datetime.date.today() - datetime.timedelta(days=365)
 
 print(BANNER)
 
-if not os.path.exists(REPO_DIR):
-    os.mkdir(REPO_DIR)
-os.chdir(REPO_DIR)
-
-if not os.path.exists(".git"):
-    subprocess.run(["git", "init"], check=True)
-
-if "origin" not in subprocess.run(["git", "remote"], capture_output=True, text=True).stdout.split():
-    subprocess.run(["git", "remote", "add", "origin", REMOTE_URL], check=True)
+# Ensure logs & tracker file are ignored by Git
+subprocess.run(["git", "update-index", "--skip-worktree", LOG_FILE, TRACKER_FILE], check=False)
 
 if os.path.exists(TRACKER_FILE):
     with open(TRACKER_FILE, "r") as f:
@@ -96,8 +88,10 @@ for x, y in letter_coords:
 
     commit_count += 1
 
-subprocess.run(["git", "branch", "-M", "main"], check=True)
-subprocess.run(["git", "push", "-u", "origin", "main"], check=True)
+# Auto-fix potential push issues (fetch before pushing)
+subprocess.run(["git", "fetch", "origin"], check=False)
+subprocess.run(["git", "pull", "--rebase", "origin", "main"], check=False)
+subprocess.run(["git", "push", "origin", "main"], check=True)
 
 with open(LOG_FILE, "a") as log:
     log.write(f"0xC001CAFE | Mission complete! '{word}' now exists across spacetime.\n")

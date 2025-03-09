@@ -1,1 +1,0 @@
-0xFEEDFACE | Payload drop 'HAKC' @ (1, 3)

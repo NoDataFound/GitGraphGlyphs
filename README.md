@@ -24,7 +24,19 @@
 
 GitGraphGlyphs is a **timemachine**, **hacker** tool that **ganks** your GitHub contribution grid to spell out whatever **NFO** you want.  
 
-**Because normal commits are for LAMERZ.**  
+**Because normal commits are for LAMERZ.** 
+
+<img width="1183" alt="Screenshot 2025-03-09 at 1 51 02 PM" src="https://github.com/user-attachments/assets/b80d196d-52df-4415-a3f2-51d4a99bc355" />
+
+
+`BEFORE`
+
+<img width="741" alt="Screenshot 2025-03-09 at 12 55 16 PM" src="https://github.com/user-attachments/assets/d13d96da-7c7b-4ada-8bc4-87951ac0920f" />
+
+`AFTER`
+
+<img width="781" alt="Screenshot 2025-03-09 at 1 44 58 PM" src="https://github.com/user-attachments/assets/a0368737-055c-4ff0-9d2b-d119764c0263" />
+
 
 [![GitHub repo size](https://img.shields.io/github/repo-size/NoDataFound/GitGraphGlyphs?color=red&label=Repo%20Size&logo=github)](https://github.com/NoDataFound/GitGraphGlyphs)  
 [![GitHub top language](https://img.shields.io/github/languages/top/NoDataFound/GitGraphGlyphs?color=yellow&label=Top%20Language)](https://github.com/NoDataFound/GitGraphGlyphs)  

@@ -28,13 +28,16 @@ BANNER = r"""
 """
 
 REPO_DIR = os.getcwd()
+COMMIT_DIR = os.path.join(REPO_DIR, "h4x_commits")
 LOG_FILE = "h4x0r_l0g.txt"
 TRACKER_FILE = "commit_t1m3_tr4ck.json"
 START_DATE = datetime.date.today() - datetime.timedelta(days=365)
 
 print(BANNER)
 
-# Ensure logs & tracker file are ignored by Git
+if not os.path.exists(COMMIT_DIR):
+    os.mkdir(COMMIT_DIR)
+
 subprocess.run(["git", "update-index", "--skip-worktree", LOG_FILE, TRACKER_FILE], check=False)
 
 if os.path.exists(TRACKER_FILE):
@@ -45,7 +48,7 @@ else:
 
 def generate_letter_matrix(word):
     font = ImageFont.load_default()
-    img_size = (len(word) * 6, 7)
+    img_size = (52, 7)  # GitHub's grid: 52 weeks wide, 7 days high
     img = Image.new("1", img_size, 0)
     draw = ImageDraw.Draw(img)
     draw.text((0, 0), word.upper(), fill=1, font=font, encoding="utf-8")
@@ -61,6 +64,9 @@ with open(LOG_FILE, "a") as log:
 commit_count = len(committed_segments)
 
 for x, y in letter_coords:
+    if x >= 52 or y >= 7:
+        continue  # Ignore anything out of GitHub's grid size
+
     commit_date = START_DATE + datetime.timedelta(weeks=x, days=y)
     segment_id = f"{x}-{y}"
 
@@ -68,7 +74,7 @@ for x, y in letter_coords:
         continue
 
     commit_message = f"0xB16B00B5 | Infiltrating '{word}' - Sector ({x}, {y})"
-    filename = f"h4x_commit_{commit_count+1}.txt"
+    filename = os.path.join(COMMIT_DIR, f"h4x_commit_{commit_count+1}.txt")
 
     with open(filename, "w") as f:
         f.write(f"0xFEEDFACE | Payload drop '{word}' @ ({x}, {y})\n")
@@ -88,7 +94,6 @@ for x, y in letter_coords:
 
     commit_count += 1
 
-# Auto-fix potential push issues (fetch before pushing)
 subprocess.run(["git", "fetch", "origin"], check=False)
 subprocess.run(["git", "pull", "--rebase", "origin", "main"], check=False)
 subprocess.run(["git", "push", "origin", "main"], check=True)
